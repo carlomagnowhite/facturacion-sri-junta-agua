@@ -1,10 +1,11 @@
 import { ConfigService } from '@nestjs/config';
-import { Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SignService } from 'src/services/sign/sign.service';
 import { InvoiceGenerationService } from 'src/services/invoice-generation/invoice-generation.service';
 import { GenerateAccessKey, generateAccessKey } from 'src/utils/Utils';
 import * as xml2js from 'xml2js';
+import { BasicAuthGuard } from 'src/guards/basic-auth/basic-auth.guard';
 
 @Controller('electronic-invoice')
 export class ElectronicInvoicesController {
@@ -20,11 +21,13 @@ export class ElectronicInvoicesController {
         private readonly invoiceService: InvoiceGenerationService
     ) { }
 
+    @UseGuards(BasicAuthGuard)
     @Get()
     saludar(): string {
         return 'HI, this is a get method from nest js';
     }
 
+    @UseGuards(BasicAuthGuard)
     @Post()
     @UseInterceptors(FileInterceptor('invoice'))
     async SignAndSendInvoice(@UploadedFile() file: Express.Multer.File): Promise<any> {
